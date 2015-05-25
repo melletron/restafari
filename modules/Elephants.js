@@ -105,7 +105,6 @@ module.exports = function (server, session) {
     });
 
     server.get('/elephants/facets/:facet', function (req, res, next) {
-        console.log(req.params)
         var names = session.elephants.pluck(req.params.facet);
         var facets = {};
         for (var i = 0; i < names.length; i++) {
