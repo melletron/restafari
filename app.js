@@ -14,7 +14,9 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 server.use(session.sessionManager);
 
-require('./modules/Elephants.js')(server, session);
+var REST = require('./REST.js');
+new REST(server, session, require('./modules/Elephants.js'), 'elephants');
+new REST(server, session, require('./modules/Zookeepers.js'), 'zookeepers');
 
 server.listen(4242, function () {
     console.log('%s listening at %s', server.name, server.url);

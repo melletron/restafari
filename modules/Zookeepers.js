@@ -1,8 +1,9 @@
 var Backbone = require('backbone');
 var faker = require('faker');
+
 var colours = ['red', 'pink', 'white', 'grey', 'green', 'blue', 'black', 'orange', 'yellow', 'purple'];
 
-var Elephant = Backbone.Model.extend({
+var Zookeeper = Backbone.Model.extend({
     idAttribute: "_id",
     initialize: function () {
         if (!this.get('_id')) {
@@ -11,16 +12,14 @@ var Elephant = Backbone.Model.extend({
     }
 });
 
-var Elephants = Backbone.Collection.extend({
-    model: Elephant
+var Zookeepers = Backbone.Collection.extend({
+    model: Zookeeper
 });
 
 var model = function () {
-    var index = Math.floor(Math.random() * 10);
     return {
         name: faker.name.firstName(),
-        colour: colours[index],
-        origin: faker.address.country()
+        boss: faker.name.firstName()
     };
 };
 
@@ -33,4 +32,4 @@ var generate = function (size) {
     return collection;
 };
 
-module.exports = new Elephants(generate(Math.floor(Math.random() * 100)));
+module.exports = new Zookeepers(generate(Math.floor(Math.random() * 100)));
