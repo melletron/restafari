@@ -20,7 +20,7 @@ Dillinger uses a number of open source projects to work properly:
 $ npm install restafari
 $ npm test
 # you can set your own folder of which it should read collections
-$ COLLECTIONS=production node app
+$ COLLECTIONS=./Backbone_collection_folder
 $ npm start
 ```
 
