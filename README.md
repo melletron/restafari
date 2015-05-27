@@ -7,9 +7,6 @@ It automatically converts Backbone collections into REST endpoints.
 1.0.0
 
 ### Tech
-
-Dillinger uses a number of open source projects to work properly:
-
 * [Backbone.js] - Two way data binding, with, whatever...
 * [Restify] - A really quick and neat way of routing the end-points
 * [Faker] - For generating large amounts of dummy data for the examples
