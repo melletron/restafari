@@ -1,5 +1,5 @@
 {
-    "name": "RESTAfari",
+    "name": "restafari",
     "version": "1.0.0",
     "description": "A small REST Stub server",
     "main": "app.js",
