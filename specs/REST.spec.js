@@ -1,85 +1,8 @@
 var chai = require('chai');
 var expect = chai.expect;
-var sinon = require('sinon')
-var EventEmitter = require('events').EventEmitter;
+var sinon = require('sinon');
 var REST = require('../REST.js');
-var mock = function () {
-        return {
-            server: {
-                get: function () {
-                },
-                post: function () {
-                },
-                put: function () {
-                },
-                del: function () {
-                }
-            },
-            req: {
-                query: {
-                    start: 1,
-                    limit: 10
-                },
-                url: '/elephants',
-                header: function (header) {
-                    switch (header) {
-                        case 'host':
-                            return 'localhost:4242';
-                            break;
-                    }
-                },
-                body: 'request body',
-                params: {
-                    id: 'id',
-                    facet: 'colour'
-                }
-            },
-            res: {
-                send: sinon.spy()
-            },
-            session: {},
-            collection: {
-                toJSON: function () {
-                    return '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20'.split(';');
-                },
-                size: function () {
-                    return this.toJSON().length;
-                },
-                add: sinon.spy(function () {
-                    return {
-                        toJSON: function () {
-                            return {
-                                'new': 'model'
-                            }
-                        }
-                    };
-                }),
-                'get': sinon.spy(function (id) {
-                    if (id !== 'id') {
-                        return undefined;
-                    }
-                    return 'that model'
-                }),
-                pluck: sinon.spy(function () {
-                    return [
-                        'orange',
-                        'purple',
-                        'yellow',
-                        'grey',
-                        'green',
-                        'green',
-                        'green',
-                        'red',
-                        'red'
-                    ]
-                }),
-                remove: sinon.spy()
-            },
-            endpoint: 'point'
-        };
-    }
-    ;
-
+var mock = require('./RESTMocks.js');
 
 //TODO better mocking
 var INITIALIZE = mock();
@@ -93,7 +16,6 @@ var UPDATE = mock();
 var UPDATE404 = mock();
 var DEL = mock();
 var DEL404 = mock();
-var DOUBLES6 = mock();
 
 describe('REST', function () {
 
@@ -109,34 +31,28 @@ describe('REST', function () {
         done();
     });
 
-    context('initialize', function () {
-        describe('setters', function () {
-            before(function () {
-                this.rest = new REST(INITIALIZE.server, INITIALIZE.session, INITIALIZE.collection, INITIALIZE.endpoint);
-            });
-            it('should set the endpoint', function (done) {
-                expect(this.rest.endpoint).to.equal(INITIALIZE.endpoint);
-                done();
-            });
-            it('should set the collection', function (done) {
-                expect(this.rest.collection).to.equal(INITIALIZE.collection);
-                done();
-            });
-            it('should set the session', function (done) {
-                expect(this.rest.session).to.equal(INITIALIZE.session);
-                done();
-            });
-            it('should set the server', function (done) {
-                expect(this.rest.server).to.equal(INITIALIZE.server);
-                done();
-            });
+    describe('initialize', function () {
+        before(function () {
+            this.rest = new REST(INITIALIZE.server, INITIALIZE.collection, INITIALIZE.endpoint);
         });
-    });
+        it('should set the endpoint', function (done) {
+            expect(this.rest.endpoint).to.equal(INITIALIZE.endpoint);
+            done();
+        });
+        it('should set the collection', function (done) {
+            expect(this.rest.collection).to.equal(INITIALIZE.collection);
+            done();
+        });
+        it('should set the server', function (done) {
+            expect(this.rest.server).to.equal(INITIALIZE.server);
+            done();
+        });
 
+    });
 
     describe('create', function () {
         before(function () {
-            this.rest = new REST(CREATE.server, CREATE.session, CREATE.collection, CREATE.endpoint);
+            this.rest = new REST(CREATE.server, CREATE.collection, CREATE.endpoint);
         });
         it('calls next and returns it\'s value', function () {
             expect(this.rest.create(CREATE.req, CREATE.res, function () {
@@ -155,7 +71,7 @@ describe('REST', function () {
 
     describe('readAll', function () {
         before(function () {
-            this.rest = new REST(READALL.server, READALL.session, READALL.collection, READALL.endpoint);
+            this.rest = new REST(READALL.server, READALL.collection, READALL.endpoint);
         });
         it('calls next and returns it\'s value', function () {
             expect(this.rest.readAll(READALL.req, READALL.res, function () {
@@ -175,7 +91,7 @@ describe('REST', function () {
 
     describe('readAll - pagination', function () {
         before(function () {
-            this.rest = new REST(READALL2.server, READALL2.session, READALL2.collection, READALL2.endpoint);
+            this.rest = new REST(READALL2.server, READALL2.collection, READALL2.endpoint);
         });
         it('calls next and returns it\'s value', function () {
             READALL2.req.query.start = 5;
@@ -198,9 +114,9 @@ describe('REST', function () {
 
     describe('readById', function () {
         before(function () {
-            this.rest = new REST(READBYID.server, READBYID.session, READBYID.collection, READBYID.endpoint);
+            this.rest = new REST(READBYID.server, READBYID.collection, READBYID.endpoint);
             READBYID404.req.params.id = '404';
-            this.rest404 = new REST(READBYID404.server, READBYID404.session, READBYID404.collection, READBYID404.endpoint);
+            this.rest404 = new REST(READBYID404.server, READBYID404.collection, READBYID404.endpoint);
             this.rest404.readById(READBYID404.req, READBYID404.res, function () {
             });
         });
@@ -224,7 +140,7 @@ describe('REST', function () {
 
     describe('readFacets', function () {
         before(function () {
-            this.rest = new REST(READFACETS.server, READFACETS.session, READFACETS.collection, READFACETS.endpoint);
+            this.rest = new REST(READFACETS.server, READFACETS.collection, READFACETS.endpoint);
         });
         it('calls next and returns it\'s value', function () {
             expect(this.rest.readFacets(READFACETS.req, READFACETS.res, function () {
@@ -249,7 +165,7 @@ describe('REST', function () {
 
     describe('update', function () {
         before(function () {
-            this.rest = new REST(UPDATE.server, UPDATE.session, UPDATE.collection, UPDATE.endpoint);
+            this.rest = new REST(UPDATE.server, UPDATE.collection, UPDATE.endpoint);
             var that = this;
             this.modelSpy = {
                 set: sinon.spy()
@@ -258,7 +174,7 @@ describe('REST', function () {
             UPDATE.collection.get = sinon.spy(function () {
                 return that.modelSpy;
             });
-            this.rest404 = new REST(UPDATE404.server, UPDATE404.session, UPDATE404.collection, UPDATE404.endpoint);
+            this.rest404 = new REST(UPDATE404.server, UPDATE404.collection, UPDATE404.endpoint);
             this.rest404.update(UPDATE404.req, UPDATE404.res, function () {
             });
         });
@@ -291,10 +207,10 @@ describe('REST', function () {
                 };
             });
 
-            this.rest = new REST(DEL.server, DEL.session, DEL.collection, DEL.endpoint);
+            this.rest = new REST(DEL.server, DEL.collection, DEL.endpoint);
 
             DEL404.req.params.id = '404';
-            this.rest404 = new REST(DEL404.server, DEL404.session, DEL404.collection, DEL404.endpoint);
+            this.rest404 = new REST(DEL404.server, DEL404.collection, DEL404.endpoint);
             this.rest404.del(DEL404.req, DEL404.res, function () {
             });
 
@@ -337,6 +253,5 @@ describe('REST', function () {
             expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).next).to.equal('/elephants?elephant=pink&start=21&limit=10');
         });
     });
-
 
 });
