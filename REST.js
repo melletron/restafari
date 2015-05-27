@@ -1,4 +1,3 @@
-var _ = require('underscore');
 var REST = function (server, collection, endpoint) {
     this.server = server;
     this.collection = collection;
@@ -113,32 +112,26 @@ REST.prototype = {
     run: function () {
         var that = this;
 
-        console.log('Creating route POST /' + that.endpoint);
         this.server.post('/' + this.endpoint, function (req, res, next) {
             that.create(req, res, next);
         });
 
-        console.log('Creating route GET /' + that.endpoint);
         this.server.get('/' + this.endpoint, function (req, res, next) {
             that.readAll(req, res, next);
         });
 
-        console.log('Creating route GET /' + that.endpoint + '/:id');
         this.server.get('/' + this.endpoint + '/:id', function (req, res, next) {
             that.readById(req, res, next);
         });
 
-        console.log('Creating route GET /' + that.endpoint + '/facets/:facet');
         this.server.get('/' + this.endpoint + '/facets/:facet', function (req, res, next) {
             that.readFacets(req, res, next);
         });
 
-        console.log('Creating route PUT /' + that.endpoint + '/:id');
         this.server.put('/' + this.endpoint + '/:id', function (req, res, next) {
             that.update(req, res, next);
         });
 
-        console.log('Creating route DELETE /' + that.endpoint + '/:id');
         this.server.del('/' + this.endpoint + '/:id', function (req, res, next) {
             that.del(req, res, next);
         });
