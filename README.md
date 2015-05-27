@@ -4,7 +4,7 @@ Restafarian is a pure REST implementation for data collections.
 It automatically converts Backbone collections into REST endpoints.
 
 ### Version
-3.0.0
+1.0.0
 
 ### Tech
 
