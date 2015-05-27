@@ -238,6 +238,10 @@ describe('REST', function () {
 
     describe('getPrevNext', function () {
 
+        before(function () {
+            this.rest = new REST(INITIALIZE.server, INITIALIZE.collection, INITIALIZE.endpoint);
+        });
+
         it('adds a start and limit to a URL that does not contain any queryetring', function () {
             expect(this.rest.getPrevNext('/elephants', 11, 10).prev).to.equal('/elephants?start=1&limit=10');
             expect(this.rest.getPrevNext('/elephants', 11, 10).next).to.equal('/elephants?start=21&limit=10');
