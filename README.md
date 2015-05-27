@@ -1,3 +1,35 @@
+# RESTAfari
+
+Restafarian is a pure REST implementation for data collections.
+It automatically converts Backbone collections into REST endpoints.
+
+### Version
+3.0.0
+
+### Tech
+
+Dillinger uses a number of open source projects to work properly:
+
+* [Backbone.js] - Two way data binding, with, whatever...
+* [Restify] - A really quick and neat way of routing the end-points
+* [Faker] - For generating large amounts of dummy data for the examples
+
+### Installation
+
+```sh
+$ npm install restafari
+$ npm test
+# you can set your own folder of which it should read collections
+$ COLLECTIONS=production node app
+$ npm start
+```
+
+### Creating collections
+You can create your own collection endpoint by making a Backbone model and collection pair and store them in your collection directory.
+Anithing goes als long as the module exports a singelton Backbone collection. You can hook them up with a MongoDB, RabbitMQ or any back-end system you please. It's your party :)
+
+#### Example
+```JavaScript
 var Backbone = require('backbone');
 var faker = require('faker');
 var colours = ['red', 'pink', 'white', 'grey', 'green', 'blue', 'black', 'orange', 'yellow', 'purple'];
@@ -57,3 +89,13 @@ var generate = function (size) {
  * @type {Elephants}
  */
 module.exports = new Elephants(generate(Math.floor(Math.random() * 100)));
+```
+### Todo's
+- Adding Websocket support
+- Making the run testable
+- Cleaning up test doubles
+
+License
+----
+
+ISC
