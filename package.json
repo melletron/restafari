@@ -1,7 +1,7 @@
 {
     "name": "restafari",
     "version": "1.0.2",
-    "description": "A small REST Stub server",
+    "description": "A small REST server",
     "main": "app.js",
     "scripts": {
         "start": "node app.js",
