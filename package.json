@@ -1,6 +1,6 @@
 {
     "name": "restafari",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A small REST Stub server",
     "main": "app.js",
     "scripts": {
@@ -34,6 +34,5 @@
     "repository": {
         "type": "git",
         "url": "git@github.com:melletron/restafari.git"
-    },
-    "readme": "README.md"
+    }
 }

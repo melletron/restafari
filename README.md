@@ -15,11 +15,59 @@ It automatically converts Backbone collections into REST endpoints.
 
 ```sh
 $ npm install restafari
-$ npm test
+```
+
+#### Running from module folder
+```sh
+$ cd node_modules/restafari
 # you can set your own folder of which it should read collections
-$ COLLECTIONS=./Backbone_collection_folder
+$ COLLECTIONS=./collection_folder
 $ npm start
 ```
+#### Running as include
+
+create your app.js
+
+app.js
+```JavaScript
+require('restafari');
+```
+
+```sh
+$ COLLECTIONS=./collection_folder
+$ node app.js
+```
+
+If you don't specify your own collection folder it will automatically load the example Elephants and Zookeepers endpoints.
+
+#### Running the test spec
+```sh
+$ cd node_modules/restafari
+$ npm install
+$ npm test
+```
+
+### Accessing the rest API
+
+When started up, the REST api exposes the endpoint based on your collection file name.
+It accepts the following requests
+
+#### create
+POST /elephants
+
+#### read
+GET /elephants
+GET /elephants/:id
+GET /elephants/facets/:facetName
+
+#### update
+PUT /elephants/:id
+
+#### delete
+DELETE /elephants/:id
+
+
+####
 
 ### Creating collections
 You can create your own collection endpoint by making a Backbone model and collection pair and store them in your collection directory.
@@ -88,6 +136,8 @@ var generate = function (size) {
 module.exports = new Elephants(generate(Math.floor(Math.random() * 100)));
 ```
 ### Todo's
+- Adding GET by key value combinations (queries)
+- Improve the prev next URL generation so it supports schema and proxied services
 - Adding Websocket support
 - Making the run testable
 - Cleaning up test doubles
