@@ -10,7 +10,7 @@ server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
 var REST = require('./REST.js');
-var collections = process.env.COLLECTIONS || './collections/';
+var collections = process.env.COLLECTIONS || __dirname + '/collections/';
 
 if (!process.env.COLLECTIONS) {
     console.log('Loading example collections');
@@ -26,6 +26,6 @@ fs.readdir(collections, function (err, files) {
     });
 });
 
-server.listen(4242, function () {
+server.listen(process.env.PORT || 4242, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
