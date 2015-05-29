@@ -16,6 +16,7 @@ var UPDATE = mock();
 var UPDATE404 = mock();
 var DEL = mock();
 var DEL404 = mock();
+var SEARCH = mock();
 
 describe('REST', function () {
 
@@ -48,6 +49,12 @@ describe('REST', function () {
             done();
         });
 
+    });
+
+    describe('parseQuery', function () {
+        it('takes a string and returns a Backbone.Collection.where parameter', function () {
+            expect(this.rest.parseQuery()).to.equal('hello');
+        });
     });
 
     describe('create', function () {
@@ -87,6 +94,20 @@ describe('REST', function () {
                 total: 20
             });
         });
+        it('doesn\'t call the where method on a regular call', function () {
+            sinon.assert.notCalled(READALL.collection.where);
+        });
+        it('calls the where method when the querystring contains search', function () {
+            READALL.req.query.search = 'set';
+            REST.prototype.parseQuery = function () {
+                return 'query';
+            };
+            expect(this.rest.readAll(READALL.req, READALL.res, function () {
+                return 'ok';
+            })).to.equal('ok');
+            sinon.assert.called(READALL.collection.where, 'query');
+        });
+
     });
 
     describe('readAll - pagination', function () {

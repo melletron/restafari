@@ -28,7 +28,7 @@ REST.prototype = {
         }
     },
     readAll: function (req, res, done) {
-
+        var selection = (req.query.search) ? this.collection.where(this.parseQuery(req.query.search)) : this.collection;
         var start = (req.query.start) ? parseInt(req.query.start) : 1;
         var limit = (req.query.limit) ? parseInt(req.query.limit) : 10;
 
@@ -44,7 +44,7 @@ REST.prototype = {
         var prevNext = this.getPrevNext('http://' + req.header('host', this.server.url) + req.url, start, limit);
         var sendObject = {
             total: total,
-            data: this.collection.toJSON().slice(start - 1, start + limit - 1),
+            data: selection.toJSON().slice(start - 1, start + limit - 1),
             start: start,
             limit: limit
         };
@@ -70,6 +70,9 @@ REST.prototype = {
             });
         }
         return next();
+    },
+    parseQuery: function () {
+        return 'hello';
     },
     readFacets: function (req, res, next) {
         var names = this.collection.pluck(req.params.facet);
