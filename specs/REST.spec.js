@@ -53,7 +53,7 @@ describe('REST', function () {
 
     describe('parseQuery', function () {
         it('takes a string and returns a Backbone.Collection.where parameter', function () {
-            expect(this.rest.parseQuery()).to.equal('hello');
+            expect(this.rest.parseQuery('{"colour":["pink", "green"]}')).to.equal('hello');
         });
     });
 
@@ -88,9 +88,9 @@ describe('REST', function () {
         it('calls res.send with it data to send to client', function () {
             sinon.assert.calledWith(READALL.res.send, {
                 data: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-                limit: 10,
-                next: "http://localhost:4242/elephants?start=11&limit=10",
-                start: 1,
+                $limit: 10,
+                next: "http://localhost:4242/elephants?$start=11&$limit=10",
+                $start: 1,
                 total: 20
             });
         });
@@ -115,8 +115,8 @@ describe('REST', function () {
             this.rest = new REST(READALL2.server, READALL2.collection, READALL2.endpoint);
         });
         it('calls next and returns it\'s value', function () {
-            READALL2.req.query.start = 5;
-            READALL2.req.query.limit = 2;
+            READALL2.req.query.$start = 5;
+            READALL2.req.query.$limit = 2;
             expect(this.rest.readAll(READALL2.req, READALL2.res, function () {
                 return 'ok';
             })).to.equal('ok');
@@ -124,10 +124,10 @@ describe('REST', function () {
         it('calls res.send with it data to send to client', function () {
             sinon.assert.calledWith(READALL2.res.send, {
                 data: ["5", "6"],
-                limit: 2,
-                prev: "http://localhost:4242/elephants?start=3&limit=2",
-                next: "http://localhost:4242/elephants?start=7&limit=2",
-                start: 5,
+                $limit: 2,
+                prev: "http://localhost:4242/elephants?$start=3&$limit=2",
+                next: "http://localhost:4242/elephants?$start=7&$limit=2",
+                $start: 5,
                 total: 20
             });
         });
@@ -264,18 +264,18 @@ describe('REST', function () {
         });
 
         it('adds a start and limit to a URL that does not contain any queryetring', function () {
-            expect(this.rest.getPrevNext('/elephants', 11, 10).prev).to.equal('/elephants?start=1&limit=10');
-            expect(this.rest.getPrevNext('/elephants', 11, 10).next).to.equal('/elephants?start=21&limit=10');
+            expect(this.rest.getPrevNext('/elephants', 11, 10).prev).to.equal('/elephants?$start=1&$limit=10');
+            expect(this.rest.getPrevNext('/elephants', 11, 10).next).to.equal('/elephants?$start=21&$limit=10');
         });
 
         it('updates a start and limit to a URL that does contain one', function () {
-            expect(this.rest.getPrevNext('/elephants?start=31&limit=10', 11, 10).prev).to.equal('/elephants?start=1&limit=10');
-            expect(this.rest.getPrevNext('/elephants?start=31&limit=10', 11, 10).next).to.equal('/elephants?start=21&limit=10');
+            expect(this.rest.getPrevNext('/elephants?$start=31&$limit=10', 11, 10).prev).to.equal('/elephants?$start=1&$limit=10');
+            expect(this.rest.getPrevNext('/elephants?$start=31&$limit=10', 11, 10).next).to.equal('/elephants?$start=21&$limit=10');
         });
 
         it('adds a start and limit to a URL that does contain a querystring', function () {
-            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).prev).to.equal('/elephants?elephant=pink&start=1&limit=10');
-            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).next).to.equal('/elephants?elephant=pink&start=21&limit=10');
+            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).prev).to.equal('/elephants?elephant=pink&$start=1&$limit=10');
+            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).next).to.equal('/elephants?elephant=pink&$start=21&$limit=10');
         });
     });
 

@@ -14,13 +14,13 @@ REST.prototype = {
     getPrevNext: function (url, start, limit) {
 
         if (!/\?/.test(url)) {
-            url += '?start=' + start + '&limit=' + limit;
-        } else if (!/start/.test(url)) {
-            url += '&start=' + start + '&limit=' + limit;
+            url += '?$start=' + start + '&$limit=' + limit;
+        } else if (!/\$start/.test(url)) {
+            url += '&$start=' + start + '&$limit=' + limit;
         }
 
-        var prev = url.replace(/start=[0-9]+/, 'start=' + (start - limit));
-        var next = url.replace(/start=[0-9]+/, 'start=' + (start + limit));
+        var prev = url.replace(/\$start=[0-9]+/, '$start=' + (start - limit));
+        var next = url.replace(/\$start=[0-9]+/, '$start=' + (start + limit));
 
         return {
             prev: prev,
@@ -29,8 +29,8 @@ REST.prototype = {
     },
     readAll: function (req, res, done) {
         var selection = (req.query.search) ? this.collection.where(this.parseQuery(req.query.search)) : this.collection;
-        var start = (req.query.start) ? parseInt(req.query.start) : 1;
-        var limit = (req.query.limit) ? parseInt(req.query.limit) : 10;
+        var start = (req.query.$start) ? parseInt(req.query.$start) : 1;
+        var limit = (req.query.$limit) ? parseInt(req.query.$limit) : 10;
 
         if (start < 1) {
             start = 1;
@@ -45,8 +45,8 @@ REST.prototype = {
         var sendObject = {
             total: total,
             data: selection.toJSON().slice(start - 1, start + limit - 1),
-            start: start,
-            limit: limit
+            $start: start,
+            $limit: limit
         };
 
         if (start > 1) {

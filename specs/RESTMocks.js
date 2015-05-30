@@ -12,8 +12,8 @@ module.exports = function () {
         },
         req: {
             query: {
-                start: 1,
-                limit: 10
+                $start: 1,
+                $limit: 10
             },
             url: '/elephants',
             header: function (header) {
