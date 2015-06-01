@@ -15,7 +15,7 @@ module.exports = Backbone.Collection.extend({
         function test(model, collection) {
             var i, key;
             for (key in collection) {
-                var needles = strToStrArray(excludes[key]);
+                var needles = strToStrArray(collection[key]);
                 for (i = 0; i < needles.length; i++) {
                     if (testValue(needles[i], model.get(key))) {
                         return true;
