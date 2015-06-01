@@ -3,6 +3,8 @@ var expect = chai.expect;
 var sinon = require('sinon');
 var REST = require('../REST.js');
 var mock = require('./RESTMocks.js');
+var Collection = require('../extend/Backbone.search.js');
+var Backbone = require('backbone');
 
 //TODO better mocking
 var INITIALIZE = mock();
@@ -51,10 +53,60 @@ describe('REST', function () {
 
     });
 
-    describe('parseQuery', function () {
-        it('takes a string and returns a Backbone.Collection.where parameter', function () {
-            expect(this.rest.parseQuery('{"colour":["pink", "green"]}')).to.equal('hello');
+    describe('execQuery', function () {
+
+        before(function () {
+            this.include = {};
+            this.exclude = {};
+            this.collection = new Collection();
+            this.collection.search = sinon.spy(function () {
+                return new Collection();
+            })
+            this.rest = new REST(SEARCH.server, this.collection, '');
         });
+
+        it('returns an instance of a Backbone.Collection', function () {
+            expect(this.rest.execQuery({}, {}) instanceof Collection).to.be.true;
+        });
+
+        it('should call a search on the collection with the selection criteria', function () {
+            sinon.assert.calledWith(this.collection.search, this.include, this.exclude);
+        });
+    });
+
+    describe('parseQuery', function () {
+
+        it('takes a query object and strips out the meta operations keys (keys starting with a $) and returns the && and || gates', function () {
+
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                colour: "pink"
+            })[0]).to.deep.equal({
+                    colour: "pink"
+                });
+
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                colour: "pink"
+            })[1]).to.deep.equal({});
+        });
+
+        it('takes a query object and strips out the inverted  and returns the && and || gates', function () {
+
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                '!colour': "pink"
+            })[0]).to.deep.equal({});
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                '!colour': "pink"
+            })[1]).to.deep.equal({colour: "pink"});
+        });
+
     });
 
     describe('create', function () {
@@ -94,18 +146,41 @@ describe('REST', function () {
                 total: 20
             });
         });
-        it('doesn\'t call the where method on a regular call', function () {
-            sinon.assert.notCalled(READALL.collection.where);
+        it('doesn\'t call the search method on a regular call', function () {
+            sinon.assert.notCalled(READALL.collection.search);
         });
-        it('calls the where method when the querystring contains search', function () {
-            READALL.req.query.search = 'set';
-            REST.prototype.parseQuery = function () {
-                return 'query';
-            };
+        it('calls the execQuery method when the query string contains data for search', function () {
+            READALL.req.query.colour = [
+                "pink",
+                "green"
+            ];
+            READALL.req.query['!colour'] = "blue";
+
+            REST.prototype.parseQuery = sinon.spy(function () {
+                return [
+                    {
+                        colour: ['pink', 'green']
+                    },
+                    {
+                        colour: 'blue'
+                    }
+                ]
+            });
+            REST.prototype.execQuery = sinon.spy(function () {
+                return {
+                    toJSON: function () {
+                        return '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20'.split(';');
+                    }
+                }
+            });
             expect(this.rest.readAll(READALL.req, READALL.res, function () {
                 return 'ok';
             })).to.equal('ok');
-            sinon.assert.called(READALL.collection.where, 'query');
+            sinon.assert.calledWith(this.rest.execQuery, {
+                colour: ['pink', 'green']
+            }, {
+                colour: 'blue'
+            });
         });
 
     });

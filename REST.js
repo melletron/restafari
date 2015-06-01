@@ -28,7 +28,13 @@ REST.prototype = {
         }
     },
     readAll: function (req, res, done) {
-        var selection = (req.query.search) ? this.collection.where(this.parseQuery(req.query.search)) : this.collection;
+        var selection;
+        var query = this.parseQuery(req.query);
+        if (Object.keys(query[0]).length !== 0 || Object.keys(query[1]).length !== 0) {
+            selection = this.execQuery(query[0], query[1]);
+        } else {
+            selection = this.collection;
+        }
         var start = (req.query.$start) ? parseInt(req.query.$start) : 1;
         var limit = (req.query.$limit) ? parseInt(req.query.$limit) : 10;
 
@@ -71,8 +77,24 @@ REST.prototype = {
         }
         return next();
     },
-    parseQuery: function () {
-        return 'hello';
+    parseQuery: function (query) {
+        var includes = {};
+        var excludes = {};
+        var keys = Object.keys(query);
+        for (var i = 0; i < keys.length; i++) {
+            if (/^\$.*$/.test(keys[i])) {
+
+            }
+            else if (/^!.*$/.test(keys[i])) {
+                excludes[keys[i].substring(1)] = query[keys[i]];
+            } else {
+                includes[keys[i]] = query[keys[i]];
+            }
+        }
+        return [includes, excludes];
+    },
+    execQuery: function (includes, excludes) {
+        return this.collection.search(includes, excludes);
     },
     readFacets: function (req, res, next) {
         var names = this.collection.pluck(req.params.facet);
