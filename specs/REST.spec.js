@@ -3,6 +3,8 @@ var expect = chai.expect;
 var sinon = require('sinon');
 var REST = require('../REST.js');
 var mock = require('./RESTMocks.js');
+var Collection = require('../extend/Backbone.search.js');
+var Backbone = require('backbone');
 
 //TODO better mocking
 var INITIALIZE = mock();
@@ -16,6 +18,7 @@ var UPDATE = mock();
 var UPDATE404 = mock();
 var DEL = mock();
 var DEL404 = mock();
+var SEARCH = mock();
 
 describe('REST', function () {
 
@@ -46,6 +49,62 @@ describe('REST', function () {
         it('should set the server', function (done) {
             expect(this.rest.server).to.equal(INITIALIZE.server);
             done();
+        });
+
+    });
+
+    describe('execQuery', function () {
+
+        before(function () {
+            this.include = {};
+            this.exclude = {};
+            this.collection = new Collection();
+            this.collection.search = sinon.spy(function () {
+                return new Collection();
+            })
+            this.rest = new REST(SEARCH.server, this.collection, '');
+        });
+
+        it('returns an instance of a Backbone.Collection', function () {
+            expect(this.rest.execQuery({}, {}) instanceof Collection).to.be.true;
+        });
+
+        it('should call a search on the collection with the selection criteria', function () {
+            sinon.assert.calledWith(this.collection.search, this.include, this.exclude);
+        });
+    });
+
+    describe('parseQuery', function () {
+
+        it('takes a query object and strips out the meta operations keys (keys starting with a $) and returns the && and || gates', function () {
+
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                colour: "pink"
+            })[0]).to.deep.equal({
+                    colour: "pink"
+                });
+
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                colour: "pink"
+            })[1]).to.deep.equal({});
+        });
+
+        it('takes a query object and strips out the inverted  and returns the && and || gates', function () {
+
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                '!colour': "pink"
+            })[0]).to.deep.equal({});
+            expect(this.rest.parseQuery({
+                $start: "11",
+                $limit: "10",
+                '!colour': "pink"
+            })[1]).to.deep.equal({colour: "pink"});
         });
 
     });
@@ -81,12 +140,49 @@ describe('REST', function () {
         it('calls res.send with it data to send to client', function () {
             sinon.assert.calledWith(READALL.res.send, {
                 data: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-                limit: 10,
-                next: "http://localhost:4242/elephants?start=11&limit=10",
-                start: 1,
+                $limit: 10,
+                next: "http://localhost:4242/elephants?$start=11&$limit=10",
+                $start: 1,
                 total: 20
             });
         });
+        it('doesn\'t call the search method on a regular call', function () {
+            sinon.assert.notCalled(READALL.collection.search);
+        });
+        it('calls the execQuery method when the query string contains data for search', function () {
+            READALL.req.query.colour = [
+                "pink",
+                "green"
+            ];
+            READALL.req.query['!colour'] = "blue";
+
+            REST.prototype.parseQuery = sinon.spy(function () {
+                return [
+                    {
+                        colour: ['pink', 'green']
+                    },
+                    {
+                        colour: 'blue'
+                    }
+                ]
+            });
+            REST.prototype.execQuery = sinon.spy(function () {
+                return {
+                    toJSON: function () {
+                        return '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20'.split(';');
+                    }
+                }
+            });
+            expect(this.rest.readAll(READALL.req, READALL.res, function () {
+                return 'ok';
+            })).to.equal('ok');
+            sinon.assert.calledWith(this.rest.execQuery, {
+                colour: ['pink', 'green']
+            }, {
+                colour: 'blue'
+            });
+        });
+
     });
 
     describe('readAll - pagination', function () {
@@ -94,8 +190,8 @@ describe('REST', function () {
             this.rest = new REST(READALL2.server, READALL2.collection, READALL2.endpoint);
         });
         it('calls next and returns it\'s value', function () {
-            READALL2.req.query.start = 5;
-            READALL2.req.query.limit = 2;
+            READALL2.req.query.$start = 5;
+            READALL2.req.query.$limit = 2;
             expect(this.rest.readAll(READALL2.req, READALL2.res, function () {
                 return 'ok';
             })).to.equal('ok');
@@ -103,10 +199,10 @@ describe('REST', function () {
         it('calls res.send with it data to send to client', function () {
             sinon.assert.calledWith(READALL2.res.send, {
                 data: ["5", "6"],
-                limit: 2,
-                prev: "http://localhost:4242/elephants?start=3&limit=2",
-                next: "http://localhost:4242/elephants?start=7&limit=2",
-                start: 5,
+                $limit: 2,
+                prev: "http://localhost:4242/elephants?$start=3&$limit=2",
+                next: "http://localhost:4242/elephants?$start=7&$limit=2",
+                $start: 5,
                 total: 20
             });
         });
@@ -243,18 +339,18 @@ describe('REST', function () {
         });
 
         it('adds a start and limit to a URL that does not contain any queryetring', function () {
-            expect(this.rest.getPrevNext('/elephants', 11, 10).prev).to.equal('/elephants?start=1&limit=10');
-            expect(this.rest.getPrevNext('/elephants', 11, 10).next).to.equal('/elephants?start=21&limit=10');
+            expect(this.rest.getPrevNext('/elephants', 11, 10).prev).to.equal('/elephants?$start=1&$limit=10');
+            expect(this.rest.getPrevNext('/elephants', 11, 10).next).to.equal('/elephants?$start=21&$limit=10');
         });
 
         it('updates a start and limit to a URL that does contain one', function () {
-            expect(this.rest.getPrevNext('/elephants?start=31&limit=10', 11, 10).prev).to.equal('/elephants?start=1&limit=10');
-            expect(this.rest.getPrevNext('/elephants?start=31&limit=10', 11, 10).next).to.equal('/elephants?start=21&limit=10');
+            expect(this.rest.getPrevNext('/elephants?$start=31&$limit=10', 11, 10).prev).to.equal('/elephants?$start=1&$limit=10');
+            expect(this.rest.getPrevNext('/elephants?$start=31&$limit=10', 11, 10).next).to.equal('/elephants?$start=21&$limit=10');
         });
 
         it('adds a start and limit to a URL that does contain a querystring', function () {
-            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).prev).to.equal('/elephants?elephant=pink&start=1&limit=10');
-            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).next).to.equal('/elephants?elephant=pink&start=21&limit=10');
+            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).prev).to.equal('/elephants?elephant=pink&$start=1&$limit=10');
+            expect(this.rest.getPrevNext('/elephants?elephant=pink', 11, 10).next).to.equal('/elephants?elephant=pink&$start=21&$limit=10');
         });
     });
 

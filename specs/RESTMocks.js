@@ -12,8 +12,8 @@ module.exports = function () {
         },
         req: {
             query: {
-                start: 1,
-                limit: 10
+                $start: 1,
+                $limit: 10
             },
             url: '/elephants',
             header: function (header) {
@@ -67,7 +67,15 @@ module.exports = function () {
                     'red'
                 ]
             }),
-            remove: sinon.spy()
+            remove: sinon.spy(),
+            where: sinon.spy(function () {
+                return {
+                    toJSON: function () {
+                        return '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20'.split(';');
+                    }
+                };
+            }),
+            search: sinon.spy()
         },
         endpoint: 'point'
     };

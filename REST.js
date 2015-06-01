@@ -14,13 +14,13 @@ REST.prototype = {
     getPrevNext: function (url, start, limit) {
 
         if (!/\?/.test(url)) {
-            url += '?start=' + start + '&limit=' + limit;
-        } else if (!/start/.test(url)) {
-            url += '&start=' + start + '&limit=' + limit;
+            url += '?$start=' + start + '&$limit=' + limit;
+        } else if (!/\$start/.test(url)) {
+            url += '&$start=' + start + '&$limit=' + limit;
         }
 
-        var prev = url.replace(/start=[0-9]+/, 'start=' + (start - limit));
-        var next = url.replace(/start=[0-9]+/, 'start=' + (start + limit));
+        var prev = url.replace(/\$start=[0-9]+/, '$start=' + (start - limit));
+        var next = url.replace(/\$start=[0-9]+/, '$start=' + (start + limit));
 
         return {
             prev: prev,
@@ -28,9 +28,15 @@ REST.prototype = {
         }
     },
     readAll: function (req, res, done) {
-
-        var start = (req.query.start) ? parseInt(req.query.start) : 1;
-        var limit = (req.query.limit) ? parseInt(req.query.limit) : 10;
+        var selection;
+        var query = this.parseQuery(req.query);
+        if (Object.keys(query[0]).length !== 0 || Object.keys(query[1]).length !== 0) {
+            selection = this.execQuery(query[0], query[1]);
+        } else {
+            selection = this.collection;
+        }
+        var start = (req.query.$start) ? parseInt(req.query.$start) : 1;
+        var limit = (req.query.$limit) ? parseInt(req.query.$limit) : 10;
 
         if (start < 1) {
             start = 1;
@@ -44,9 +50,9 @@ REST.prototype = {
         var prevNext = this.getPrevNext('http://' + req.header('host', this.server.url) + req.url, start, limit);
         var sendObject = {
             total: total,
-            data: this.collection.toJSON().slice(start - 1, start + limit - 1),
-            start: start,
-            limit: limit
+            data: selection.toJSON().slice(start - 1, start + limit - 1),
+            $start: start,
+            $limit: limit
         };
 
         if (start > 1) {
@@ -70,6 +76,25 @@ REST.prototype = {
             });
         }
         return next();
+    },
+    parseQuery: function (query) {
+        var includes = {};
+        var excludes = {};
+        var keys = Object.keys(query);
+        for (var i = 0; i < keys.length; i++) {
+            if (/^\$.*$/.test(keys[i])) {
+
+            }
+            else if (/^!.*$/.test(keys[i])) {
+                excludes[keys[i].substring(1)] = query[keys[i]];
+            } else {
+                includes[keys[i]] = query[keys[i]];
+            }
+        }
+        return [includes, excludes];
+    },
+    execQuery: function (includes, excludes) {
+        return this.collection.search(includes, excludes);
     },
     readFacets: function (req, res, next) {
         var names = this.collection.pluck(req.params.facet);
