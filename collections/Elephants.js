@@ -20,7 +20,7 @@ var Elephant = Backbone.Model.extend({
  * @description This Backbone collection can be bound to a backoffice if you'd like to
  * @type {*|void}
  */
-var Elephants = require('../extend/Backbone.where.or.js').extend({
+var Elephants = require('../extend/Backbone.search.js').extend({
     model: Elephant
 });
 
