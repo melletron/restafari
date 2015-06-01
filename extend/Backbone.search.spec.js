@@ -52,7 +52,12 @@ describe('Backbone.search', function () {
             expect(this.collRegex.search({a: ['.*Elephant']}).length).to.equal(3);
             expect(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}).length).to.equal(3);
             expect(this.collRegex.search({a: ['Elephant']}).length).to.equal(2);
-        })
+        });
+        it('excludes the excluded key value pairs', function () {
+            expect(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {a: ['Polar Bear']}).length).to.equal(2);
+            expect(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {a: 'Polar Bear'}).length).to.equal(2);
+//            console.log(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {a: 'Polar Bear'}))
+        });
 
     });
 });
