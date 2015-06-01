@@ -12,9 +12,9 @@ module.exports = Backbone.Collection.extend({
             return RegExp('^' + query + '$').test(value);
         }
 
-        function testExclude(model) {
+        function test(model, collection) {
             var i, key;
-            for (key in excludes) {
+            for (key in collection) {
                 var needles = strToStrArray(excludes[key]);
                 for (i = 0; i < needles.length; i++) {
                     if (testValue(needles[i], model.get(key))) {
@@ -29,28 +29,20 @@ module.exports = Backbone.Collection.extend({
                 key,
                 i;
 
-            for (key in includes) {
-
-                needles = strToStrArray(includes[key]);
-
-                if (!_.contains(needles, model.get(key))) {
-
-                    for (i = 0; i < needles.length; i++) {
-
-                        if (testValue(needles[i], model.get(key))) {
-
-                            if (testExclude(model)) {
-                                return false;
+            if (test(model, excludes)) {
+                return false;
+            } else {
+                for (key in includes) {
+                    needles = strToStrArray(includes[key]);
+                    if (!_.contains(needles, model.get(key))) {
+                        for (i = 0; i < needles.length; i++) {
+                            if (testValue(needles[i], model.get(key))) {
+                                return true;
                             }
-                            return true;
-
                         }
-
+                        return false;
                     }
-                    return false;
-
                 }
-
             }
             return true;
         }));
