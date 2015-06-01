@@ -53,18 +53,40 @@ When started up, the REST api exposes the endpoint based on your collection file
 It accepts the following requests
 
 #### create
-POST /elephants
+- POST /elephants
 
 #### read
-GET /elephants
-GET /elephants/:id
-GET /elephants/facets/:facetName
+- GET /elephants
+- GET /elephants/:id
+- GET /elephants/facets/:facetName
+
+#### query
+Get only green elephants
+- GET /elephants?colour=green
+
+Get green and red elephants
+- GET /elephants?colour=green&colour=red
+
+Get green and red elephants not named Nelly
+- GET /elephants?colour=green&colour=red&!name=Nelly
+
+Get green and red elephants not named Nelly or James
+- GET /elephants?colour=green&colour=red&!name=Nelly&name=James
+
+Or use regular expressions instead
+- GET /elephants?colour=(green|red)&!name=(Nelly|James)
+- GET /elephants?name=N.*
+- GET /elephants?name=N.*
+Only elephants from Islands
+- GET /elephants?origin=.*Islands
+No elephants from Islands
+- GET /elephants?!origin=.*Islands
 
 #### update
-PUT /elephants/:id
+- PUT /elephants/:id
 
 #### delete
-DELETE /elephants/:id
+- DELETE /elephants/:id
 
 
 ####
@@ -97,7 +119,7 @@ var Elephant = Backbone.Model.extend({
  * @description This Backbone collection can be bound to a backoffice if you'd like to
  * @type {*|void}
  */
-var Elephants = Backbone.Collection.extend({
+var Elephants = require('../extend/Backbone.search.js').extend({
     model: Elephant
 });
 
@@ -136,11 +158,41 @@ var generate = function (size) {
 module.exports = new Elephants(generate(Math.floor(Math.random() * 100)));
 ```
 ### Todo's
-- Adding GET by key value combinations (queries)
+- Sorting
+- Adding relational structures E.g. GET zoo/xyz123/elephants returning all elephants belonging to zoo with id xyz123
 - Improve the prev next URL generation so it supports schema and proxied services
 - Adding Websocket support
 - Making the run testable
 - Cleaning up test doubles
+
+### Release notes
+
+#### 1.1.0 - integrating search-queries
+In this release I've added
+- extend/Backbone.search.js
+- extend/Backbone.search.spec.js
+
+This is an extension to Backbone and tested in isolation.
+
+The REST object integrates the new search features for which I added the methods:
+- parseQuery
+- execQuery
+
+I've updated the readAll method to use these when it receives key value pairs in the query string.
+
+start and limit are now preceded by a $ to indicate meta operations.
+The ! is used to exclude key value pairs from the query.
+
+To use the search you'd have to initiate your collection with:
+```JavaScript
+var Elephants = require('../extend/Backbone.search.js').extend({
+    model: Elephant
+});
+```
+
+##### Known issues
+the prev and next meta values don't allow you to go beyond the collection.
+ it currently doesn't limit when in queried mode ... not sure if we should consider it a defect.
 
 License
 ----
