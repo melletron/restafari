@@ -18,9 +18,9 @@ describe('Backbone.search', function () {
             {a: 'Elephant'},
             {a: 'Elephant', b: 'Snake'},
             {a: 'Indian Elephant', b: 'Python'},
-            {a: 'Brown Bear'},
-            {a: 'Grizzly Bear'},
-            {a: 'Polar Bear'}
+            {a: 'Brown Bear', b: 'John'},
+            {a: 'Grizzly Bear', b: 'Steve'},
+            {a: 'Polar Bear', b: 'Jack'}
         ]);
 
     });
@@ -54,8 +54,7 @@ describe('Backbone.search', function () {
             expect(this.collRegex.search({a: ['Elephant']}).length).to.equal(2);
         });
         it('excludes the excluded key value pairs', function () {
-            expect(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {a: ['Polar Bear']}).length).to.equal(2);
-            expect(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {a: 'Polar Bear'}).length).to.equal(2);
+            expect(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {b: 'Jack'}).length).to.equal(2);
 //            console.log(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {a: 'Polar Bear'}))
         });
 

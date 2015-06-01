@@ -12,15 +12,19 @@ module.exports = Backbone.Collection.extend({
             return RegExp('^' + query + '$').test(value);
         }
 
-        function testExclude(key, model) {
-            var i;
-            var needles = strToStrArray(excludes[key]);
-            for (i = 0; i < needles.length; i++) {
-                return testValue(needles[i], model.get(key));
+        function testExclude(model) {
+            var i, key;
+            for (key in excludes) {
+                var needles = strToStrArray(excludes[key]);
+                for (i = 0; i < needles.length; i++) {
+                    if (testValue(needles[i], model.get(key))) {
+                        return true;
+                    }
+                }
             }
         }
 
-        return this.filter(function (model) {
+        return new Backbone.Collection(this.filter(function (model) {
             var needles,
                 key,
                 i;
@@ -35,7 +39,7 @@ module.exports = Backbone.Collection.extend({
 
                         if (testValue(needles[i], model.get(key))) {
 
-                            if (testExclude(key, model)) {
+                            if (testExclude(model)) {
                                 return false;
                             }
                             return true;
@@ -49,6 +53,6 @@ module.exports = Backbone.Collection.extend({
 
             }
             return true;
-        });
+        }));
     }
 });
