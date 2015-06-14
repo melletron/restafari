@@ -354,4 +354,118 @@ describe('REST', function () {
         });
     });
 
+    describe('sortBy', function () {
+        before(function () {
+            this.collection = new Collection([
+                {
+                    name: 'a',
+                    colour: 'b',
+                    origin: 'c',
+                    other: 'a'
+                },
+                {
+                    name: 'b',
+                    colour: 'c',
+                    origin: 'a',
+                    other: 'a'
+                },
+                {
+                    name: 'c',
+                    colour: 'a',
+                    origin: 'b',
+                    other: 'b'
+                },
+            ]);
+            this.rest = new REST(INITIALIZE.server, this.collection, INITIALIZE.endpoint);
+        });
+
+        it('has an unordered baseline', function () {
+            expect(this.collection.models[0].toJSON()).to.deep.equal({
+                name: 'a',
+                colour: 'b',
+                origin: 'c',
+                other: 'a'
+            });
+            expect(this.collection.models[1].toJSON()).to.deep.equal({
+                name: 'b',
+                colour: 'c',
+                origin: 'a',
+                other: 'a'
+            });
+            expect(this.collection.models[2].toJSON()).to.deep.equal({
+                name: 'c',
+                colour: 'a',
+                origin: 'b',
+                other: 'b'
+            });
+        })
+
+        it('takes a string and sorts collection by string', function () {
+            expect(this.rest.sortBy('colour')).to.equal(true);
+            expect(this.collection.models[0].toJSON()).to.deep.equal({
+                name: 'c',
+                colour: 'a',
+                origin: 'b',
+                other: 'b'
+            });
+            expect(this.collection.models[1].toJSON()).to.deep.equal({
+                name: 'a',
+                colour: 'b',
+                origin: 'c',
+                other: 'a'
+            });
+            expect(this.collection.models[2].toJSON()).to.deep.equal({
+                name: 'b',
+                colour: 'c',
+                origin: 'a',
+                other: 'a'
+            });
+        });
+
+        it('can do a descending sort', function () {
+            expect(this.rest.sortBy('colour', true)).to.equal(true);
+            expect(this.collection.models[2].toJSON()).to.deep.equal({
+                name: 'c',
+                colour: 'a',
+                origin: 'b',
+                other: 'b'
+            });
+            expect(this.collection.models[1].toJSON()).to.deep.equal({
+                name: 'a',
+                colour: 'b',
+                origin: 'c',
+                other: 'a'
+            });
+            expect(this.collection.models[0].toJSON()).to.deep.equal({
+                name: 'b',
+                colour: 'c',
+                origin: 'a',
+                other: 'a'
+            });
+        });
+
+//        it('takes am array and sorts collection by multiple keys', function () {
+//            expect(this.rest.sortBy(['colour', 'other'])).to.equal(true);
+//            expect(this.collection.models[0].toJSON()).to.deep.equal({
+//                name: 'c',
+//                colour: 'a',
+//                origin: 'b',
+//                other: 'a'
+//            });
+//            expect(this.collection.models[1].toJSON()).to.deep.equal({
+//                name: 'a',
+//                colour: 'b',
+//                origin: 'c',
+//                other: 'a'
+//            });
+//            expect(this.collection.models[2].toJSON()).to.deep.equal({
+//                name: 'b',
+//                colour: 'c',
+//                origin: 'a',
+//                other: 'b'
+//            });
+//        });
+
+    });
+
 });

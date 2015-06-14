@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var REST = function (server, collection, endpoint) {
     this.server = server;
     this.collection = collection;
@@ -134,6 +135,22 @@ REST.prototype = {
         }
         return next();
     },
+    sortBy: function (sort, desc) {
+        if (!_.isArray(sort)) {
+            sort = [sort];
+        }
+        if (desc) {
+            this.collection.comparator = function (model) {
+                return _.map(model.get(sort).toLowerCase().split(""), function (letter) {
+                    return String.fromCharCode(-(letter.charCodeAt(0)));
+                });
+            };
+        } else {
+            this.collection.comparator = sort;
+        }
+        this.collection.sort();
+        return true;
+    },
     run: function () {
         var that = this;
 
@@ -160,6 +177,7 @@ REST.prototype = {
         this.server.del('/' + this.endpoint + '/:id', function (req, res, next) {
             that.del(req, res, next);
         });
+
     }
 };
 
