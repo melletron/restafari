@@ -6,6 +6,14 @@ It automatically converts Backbone collections into REST endpoints.
 ### Version
 1.1.0
 
+
+### Design Principles
+
+1. It leverages resources, methods and HATEOAS.
+["If you’re not using resources, methods and HATEOAS then it isn’t really a RESTful API".](http://www.ben-morris.com/the-restafarian-flame-wars-common-points-of-disagreement-over-rest-api-design/)
+
+
+
 ### Tech
 * [Backbone.js] - Two way data binding, with, whatever...
 * [Restify] - A really quick and neat way of routing the end-points
@@ -77,8 +85,10 @@ Or use regular expressions instead
 - GET /elephants?colour=(green|red)&!name=(Nelly|James)
 - GET /elephants?name=N.*
 - GET /elephants?name=N.*
+
 Only elephants from Islands
 - GET /elephants?origin=.*Islands
+
 No elephants from Islands
 - GET /elephants?!origin=.*Islands
 
@@ -159,6 +169,7 @@ module.exports = new Elephants(generate(Math.floor(Math.random() * 100)));
 ```
 ### Todo's
 - Sorting
+- Generic search queries
 - Adding relational structures E.g. GET zoo/xyz123/elephants returning all elephants belonging to zoo with id xyz123
 - Improve the prev next URL generation so it supports schema and proxied services
 - Adding Websocket support
