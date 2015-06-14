@@ -5,6 +5,9 @@ var server = restify.createServer({
     version: require('./package').version
 });
 
+var Templates = require('./controllers/templateRender.js');
+var templates = new Templates();
+
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
@@ -21,10 +24,26 @@ fs.readdir(collections, function (err, files) {
         throw err;
     }
     files.forEach(function (file) {
-        new REST(server, require(collections + file), file.replace(/\.js$/, '').toLowerCase());
-        console.log('Added enpoint', file.replace(/\.js$/, '').toLowerCase())
+        new REST(server, require(collections + file), 'rest/' + file.replace(/\.js$/, '').toLowerCase());
+        console.log('Added endpoint', 'rest/' + file.replace(/\.js$/, '').toLowerCase())
     });
 });
+
+server.get('/app/js/templates.js', function (req, res, next) {
+    var body = templates.templateSource;
+    res.writeHead(200, {
+        'Content-Length': Buffer.byteLength(body),
+        'Content-Type': 'text/javascript'
+    });
+    res.write(body);
+    res.end();
+    next();
+});
+
+server.get(/\/app\/?.*/, restify.serveStatic({
+    directory: './application/',
+    default: 'index.html'
+}));
 
 server.listen(process.env.PORT || 4242, function () {
     console.log('%s listening at %s', server.name, server.url);
