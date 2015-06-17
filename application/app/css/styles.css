@@ -1,3 +1,114 @@
-* {
-    background-color: green;
+
+html.cpn-chrome,
+.cpn-chrome body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+.cpn-chrome nav {
+    width: 100%;
+    overflow: hidden;
+    position: fixed;
+    height: 46px;
+    /*background-color: @brand-primary;*/
+    background-color: red;
+    -webkit-transition: -webkit-transform 0.2s ease-out;
+    -moz-transition:    -moz-transform 0.2s ease-out;
+    -ms-transition:     -ms-transform 0.2s ease-out;
+    transition:         transform 0.2s ease-out;
+    z-index: 1;
+    color: #fff;
+}
+
+.cpn-chrome nav [role=head-nav]{
+    padding-left: 0;
+}
+
+.menu-open.cpn-chrome nav, .menu-open.cpn-chrome footer {
+    -webkit-transform: translateX(260px);
+    -moz-transform: translateX(260px);
+    -ms-transform: translateX(260px);
+    transform: translateX(260px);
+}
+
+.cpn-chrome footer {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    -webkit-transition: -webkit-transform 0.2s ease-out;
+    -moz-transition:    -moz-transform 0.2s ease-out;
+    -ms-transition:     -ms-transform 0.2s ease-out;
+    transition:         transform 0.2s ease-out;
+    overflow: hidden;
+    background-color: blue;
+}
+
+.cpn-chrome .app-menu {
+    width: 260px;
+    border-right: solid 3px #f5f2ed;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    background-color: lightgray;
+    /*padding-top: 46px;*/
+
+    -webkit-transform: translateX(-260px);
+    -moz-transform: translateX(-260px);
+    -ms-transform: translateX(-260px);
+    transform: translateX(-260px);
+
+    -webkit-transition: -webkit-transform 0.2s ease-out;
+    -moz-transition:    -moz-transform 0.2s ease-out;
+    -ms-transition:     -ms-transform 0.2s ease-out;
+    transition:         transform 0.2s ease-out;
+
+
+
+}
+
+.menu-open.cpn-chrome .app-menu {
+    -webkit-transform: translateX(0px);
+    -moz-transform: translateX(0px);
+    -ms-transform: translateX(0px);
+    transform: translateX(0px);
+}
+
+.cpn-chrome .app-main {
+    margin-top: 46px;
+    padding-bottom: 24px;
+
+    -webkit-transition: -webkit-transform 0.2s ease-out;
+    -moz-transition:    -moz-transform 0.2s ease-out;
+    -ms-transition:     -ms-transform 0.2s ease-out;
+    transition:         transform 0.2s ease-out;
+
+}
+
+.menu-open.cpn-chrome .app-main {
+    margin-left: 260px;
+}
+
+@media (max-width: 767px) {
+    .menu-open.cpn-chrome .app-main {
+        -webkit-transform: translateX(260px);
+        -moz-transform: translateX(260px);
+        -ms-transform: translateX(260px);
+        transform: translateX(260px);
+    }
+
+    .cpn-chrome .app-main, .menu-open.cpn-chrome .app-main {
+        margin-left: 0px;
+    }
+}
+
+.cpn-chrome .app-main {
+    margin-bottom: 24px;
+}
+
+.cpn-chrome footer {
+    height: 24px;
 }
