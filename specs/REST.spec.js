@@ -76,6 +76,16 @@ describe('REST', function () {
 
     describe('parseQuery', function () {
 
+        before(function () {
+            this.include = {};
+            this.exclude = {};
+            this.collection = new Collection();
+            this.collection.search = sinon.spy(function () {
+                return new Collection();
+            })
+            this.rest = new REST(SEARCH.server, this.collection, '');
+        });
+
         it('takes a query object and strips out the meta operations keys (keys starting with a $) and returns the && and || gates', function () {
 
             expect(this.rest.parseQuery({
@@ -170,6 +180,9 @@ describe('REST', function () {
                 return {
                     toJSON: function () {
                         return '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20'.split(';');
+                    },
+                    size: function () {
+                        return 20;
                     }
                 }
             });

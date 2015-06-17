@@ -46,7 +46,7 @@ REST.prototype = {
             limit = 1;
         }
 
-        var total = this.collection.size();
+        var total = selection.size();
 
         var prevNext = this.getPrevNext('http://' + req.header('host', this.server.url) + req.url, start, limit);
         var sendObject = {
