@@ -267,7 +267,7 @@ describe('REST', function () {
                 yellow: 1,
                 grey: 1,
                 green: 3,
-                red: 2
+                red: 3
             });
         });
     });

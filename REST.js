@@ -98,15 +98,26 @@ REST.prototype = {
         return this.collection.search(includes, excludes);
     },
     readFacets: function (req, res, next) {
+
         var names = this.collection.pluck(req.params.facet);
         var facets = {};
-        for (var i = 0; i < names.length; i++) {
-            if (facets[names[i]]) {
-                facets[names[i]] += 1;
-            } else {
-                facets[names[i]] = 1;
+
+        var extractFacets = function (names) {
+            for (var i = 0; i < names.length; i++) {
+                if (_.isArray(names[i])) {
+                    extractFacets(names[i]);
+                } else {
+                    if (facets[names[i]]) {
+                        facets[names[i]] += 1;
+                    } else {
+                        facets[names[i]] = 1;
+                    }
+                }
             }
-        }
+        };
+
+
+        extractFacets(names)
         res.send(facets);
         return next();
     },
