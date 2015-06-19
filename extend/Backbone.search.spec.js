@@ -23,6 +23,15 @@ describe('Backbone.search', function () {
             {a: 'Polar Bear', b: 'Jack'}
         ]);
 
+        this.arraySearch = new Backbone.Collection([
+            {a: ['Mosquito', 'Elephant']},
+            {a: 'Elephant', b: 'Snake'},
+            {a: 'Indian Elephant', b: 'Python'},
+            {a: 'Brown Bear', b: 'John'},
+            {a: 'Grizzly Bear', b: 'Steve'},
+            {a: 'Polar Bear', b: 'Jack'}
+        ]);
+
     });
     it('passes the same acceptance criteria as the original Backbone.Collection.prototype.where spec', function () {
         expect(this.coll.search({a: 1}).length).to.equal(3);
@@ -58,6 +67,10 @@ describe('Backbone.search', function () {
             expect(this.collRegex.search({a: ['Brown Bear', 'Grizzly Bear', 'Polar Bear']}, {b: 'Jack'}).length).to.equal(2);
             expect(this.collRegex.search({a: ['Brown Bear', 'Grizzly Bear', 'Polar Bear']}, {b: ['Jack', 'John']}).length).to.equal(1);
 //            console.log(this.collRegex.search({a: ['(Brown|Grizzly|Polar) Bear']}, {a: 'Polar Bear'}))
+        });
+
+        it('can search inside arrays', function () {
+            expect(this.arraySearch.search({a: 'Elephant'}).length).to.equal(2);
         });
 
     });

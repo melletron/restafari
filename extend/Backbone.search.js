@@ -4,12 +4,20 @@ module.exports = Backbone.Collection.extend({
     search: function (includes, excludes) {
         excludes = excludes || {};
 
+
         function strToStrArray(value) {
             return (!_.isArray(value)) ? [value] : value;
         };
 
         function testValue(query, value) {
-            return RegExp('^' + query + '$').test(value);
+            value = strToStrArray(value);
+            var i;
+            for (i = 0; i < value.length; i++) {
+                if (RegExp('^' + query + '$').test(value[i])) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         function test(model, collection) {
