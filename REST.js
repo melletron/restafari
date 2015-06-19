@@ -28,14 +28,21 @@ REST.prototype = {
             next: next
         }
     },
-    readAll: function (req, res, done) {
+    readAll: function (req, res, done, preSelection) {
         var selection;
         var query = this.parseQuery(req.query);
-        if (Object.keys(query[0]).length !== 0 || Object.keys(query[1]).length !== 0) {
-            selection = this.execQuery(query[0], query[1]);
+
+        if (preSelection) {
+            selection = preSelection;
         } else {
-            selection = this.collection;
+            if (Object.keys(query[0]).length !== 0 || Object.keys(query[1]).length !== 0) {
+                selection = this.execQuery(query[0], query[1]);
+            } else {
+                selection = this.collection;
+            }
         }
+
+
         var start = (req.query.$start) ? parseInt(req.query.$start) : 1;
         var limit = (req.query.$limit) ? parseInt(req.query.$limit) : 10;
 
@@ -71,6 +78,17 @@ REST.prototype = {
         var model = this.collection.get(req.params.id);
         if (model) {
             res.send(model);
+        } else {
+            res.send(404, {
+                message: 'entry not found'
+            });
+        }
+        return next();
+    },
+    readCollectionOfId: function (req, res, next) {
+        var model = this.collection.get(req.params.id);
+        if (model) {
+            return this.readAll(req, res, next, model.get(req.params.collection));
         } else {
             res.send(404, {
                 message: 'entry not found'
@@ -166,26 +184,37 @@ REST.prototype = {
         var that = this;
 
         this.server.post('/' + this.endpoint, function (req, res, next) {
+            res.charSet('utf-8');
             that.create(req, res, next);
         });
 
         this.server.get('/' + this.endpoint, function (req, res, next) {
+            res.charSet('utf-8');
             that.readAll(req, res, next);
         });
 
         this.server.get('/' + this.endpoint + '/:id', function (req, res, next) {
+            res.charSet('utf-8');
             that.readById(req, res, next);
         });
 
+        this.server.get('/' + this.endpoint + '/:id/:collection', function (req, res, next) {
+            res.charSet('utf-8');
+            that.readCollectionOfId(req, res, next);
+        });
+
         this.server.get('/' + this.endpoint + '/facets/:facet', function (req, res, next) {
+            res.charSet('utf-8');
             that.readFacets(req, res, next);
         });
 
         this.server.put('/' + this.endpoint + '/:id', function (req, res, next) {
+            res.charSet('utf-8');
             that.update(req, res, next);
         });
 
         this.server.del('/' + this.endpoint + '/:id', function (req, res, next) {
+            res.charSet('utf-8');
             that.del(req, res, next);
         });
 

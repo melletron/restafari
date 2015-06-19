@@ -9,6 +9,7 @@ var Backbone = require('backbone');
 //TODO better mocking
 var INITIALIZE = mock();
 var CREATE = mock();
+var READCOLLECTIONOFID = mock();
 var READALL = mock();
 var READALL2 = mock();
 var READBYID = mock();
@@ -136,6 +137,45 @@ describe('REST', function () {
                 'new': 'model'
             });
         });
+    });
+
+    /**
+     * This is an integrated test testing the relation between two methods
+     */
+    describe('readCollectionOfId', function () {
+        before(function () {
+            READCOLLECTIONOFID.collection.get = function () {
+                return {
+                    get: function () {
+                        return {
+                            size: function () {
+                                return 'readCollectionOfId';
+                            },
+                            toJSON: function () {
+                                return [1, 2, 3, 4, 5, 6]
+                            }
+                        };
+                    }
+                };
+            };
+            this.rest = new REST(READCOLLECTIONOFID.server, READCOLLECTIONOFID.collection, READCOLLECTIONOFID.endpoint);
+        });
+        it('checks if the model exists and then calls readAll with the selected collection', function () {
+            expect(this.rest.readCollectionOfId(READCOLLECTIONOFID.req, READCOLLECTIONOFID.res, function () {
+                return 'ok';
+            })).to.equal('ok');
+        });
+
+        it('readAll finishes of the work on the specific collection', function () {
+            sinon.assert.calledWith(READCOLLECTIONOFID.res.send, {
+                    $limit: 10,
+                    $start: 1,
+                    data: [1, 2, 3, 4, 5, 6],
+                    total: "readCollectionOfId" }
+            );
+        });
+
+
     });
 
     describe('readAll', function () {
