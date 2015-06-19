@@ -198,14 +198,14 @@ REST.prototype = {
             that.readById(req, res, next);
         });
 
-        this.server.get('/' + this.endpoint + '/:id/:collection', function (req, res, next) {
-            res.charSet('utf-8');
-            that.readCollectionOfId(req, res, next);
-        });
-
         this.server.get('/' + this.endpoint + '/facets/:facet', function (req, res, next) {
             res.charSet('utf-8');
             that.readFacets(req, res, next);
+        });
+
+        this.server.get('/' + this.endpoint + '/:id/:collection', function (req, res, next) {
+            res.charSet('utf-8');
+            that.readCollectionOfId(req, res, next);
         });
 
         this.server.put('/' + this.endpoint + '/:id', function (req, res, next) {
