@@ -64,7 +64,7 @@ module.exports = function () {
                     'green',
                     'green',
                     'red',
-                    'red'
+                    ['red', 'red']
                 ]
             }),
             remove: sinon.spy(),
