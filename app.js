@@ -1,3 +1,4 @@
+var path = require('path');
 var fs = require('fs');
 var restify = require('restify');
 var server = restify.createServer({
@@ -21,7 +22,7 @@ fs.readdir(collections, function (err, files) {
         throw err;
     }
     files.forEach(function (file) {
-        new REST(server, require(collections + file), file.replace(/\.js$/, '').toLowerCase());
+        new REST(server, require(path.resolve(collections + file)), file.replace(/\.js$/, '').toLowerCase());
         console.log('Added enpoint', file.replace(/\.js$/, '').toLowerCase())
     });
 });
